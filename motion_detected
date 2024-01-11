@@ -1,0 +1,28 @@
+#!/bin/bash
+
+#sudo -i
+
+export DISPLAY=":0"
+echo -ne '\007'
+#echo "What are you doing in here?" | espeak
+$date=`date`
+echo "[$date] *****TRIPHAZARD***** motion_detected" >> /usr/local/log/triphazard.log
+
+echo "motion detected"
+echo `xdotool type '\n'`
+feh -F -Z /usr/local/img/RedEye.jpg &
+
+#echo "32" > /sys/class/gpio/export
+#echo "out" > /sys/class/gpio/gpio32/direction
+
+#test=`/usr/local/bin/rgbColor.py red`
+
+
+mpg123 -D 1 -f 8000 /usr/local/snd/computerbeep_42.mp3 &
+mpg123 -D 1 -f 8000 /usr/local/snd/bullshit.mp3 &
+#pid=`pidof feh`
+#kill=`kill $pid`
+echo  $test
+#echo "killed pid: $pid"
+
+exit 0;

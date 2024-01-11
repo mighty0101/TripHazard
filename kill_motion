@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+
+pid=$(pgrep motion)
+out=`kill $pid`
+echo $out

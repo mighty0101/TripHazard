@@ -1,0 +1,47 @@
+#!/usr/bin/python
+
+#http://www.raspberry-projects.com/pi/programming-in-python/i2c-programming-in-python/using-the-i2c-interface-2
+
+# -*- coding: utf-8 -*-
+import smbus
+import time
+import sys
+import os
+
+
+bus = smbus.SMBus(1)
+address = 0x08
+
+clear = lambda: os.system('clear')
+clear()
+
+print("\n************ TripHazard Command Console *************")
+print("type 'exit' to quit.\n\n")
+
+
+def writeData(value):
+    byteValue = StringToBytes(value)
+    bus.write_i2c_block_data(address,0x00,byteValue) #first byte is 0=command byte.. just is.
+    return -1
+
+def StringToBytes(val):
+        retVal = []
+        for c in val:
+                retVal.append(ord(c))
+        return retVal
+
+while True:
+    
+    data = input("TripHazard: ")
+
+    if data == "exit":
+       sys.exit("bye")
+
+    print("sending\n")
+    writeData(data)
+
+    clear = lambda: os.system('clear')
+    clear()
+
+    print("\n************ TripHazard Command Console *************")
+    print("type 'exit' to quit.\n\n")

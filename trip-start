@@ -1,0 +1,9 @@
+#/bin/bash
+
+echo "connect 28:FA:19:56:D2:32" | bluetoothctl &
+
+export DISPLAY=":0"
+
+/usr/bin/motion &
+
+

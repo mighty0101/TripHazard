@@ -1,0 +1,13 @@
+#!/bin/bash
+
+export DISPLAY=":0"
+echo -ne '\007'
+#echo "Tell your mom I said hi." | espeak
+feh -F -Z /usr/local/img/BlueEye.jpg &
+
+#test=`/usr/local/bin/rgbColor.py green`
+
+#mpg123 /usr/local/snd/whoTheFuckAreYou-UK.mp3
+#pid=`pidof feh`
+#out=`kill $pid`
+#echo $out
