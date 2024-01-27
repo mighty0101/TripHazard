@@ -5,16 +5,6 @@
 #define SLAVE_ADDRESS 0x08
 #define buzzPin 49
 
-// FastLED
-#define LED_PIN     10
-#define NUM_LEDS    144
-#define BRIGHTNESS  64
-#define LED_TYPE    WS2812
-#define COLOR_ORDER GRBq  
-#define UPDATES_PER_SECOND 100
-CRGB leds[NUM_LEDS];
-
-// End FastLED
 
 
 volatile boolean receiveFlag = false;
@@ -23,30 +13,30 @@ String command;
 
 
 //######  Assign Motor Controller Variables to pin numbers
-
+/*
 //Motor 4
   int M4__RPWM = 2;  // Digital/PWM pin 5 to the M4__RPWM on the BTS7960
-  int M4__LPWM = 3;  // Digital/PWM pin 6 to the M4__LPWM on the BTS7960
-  int M4__L_EN = 22;  // connect Digital/PWM pin 7 to M4__L_EN on the BTS7960
-  int M4__R_EN = 23;  // connect Digital/PWM pin 8 to M4__R_EN on the BTS7960
-
-//Motor 3
-  int M3__RPWM = 4;  // Digital/PWM pin 5 to the M4__RPWM on the BTS7960
-  int M3__LPWM = 5;  // Digital/PWM pin 6 to the M4__LPWM on the BTS7960
-  int M3__L_EN = 24;  // connect Digital/PWM pin 7 to M4__L_EN on the BTS7960
-  int M3__R_EN = 25;  // connect Digital/PWM pin 8 to M4__R_EN on the BTS7960
-  
+  int M4__LPWM = 3;  // Digital/PWM pin 6 to the M2__LPWM on the BTS7960
+  int M4__L_EN = 22;  // connect Digital/PWM pin 7 to M2__L_EN on the BTS7960
+  int M4__R_EN = 23;  // connect Digital/PWM pin 8 to M2__R_EN on the BTS7960
+*/
 //Motor 2
-  int M2__RPWM = 6;  // Digital/PWM pin 5 to the M4__RPWM on the BTS7960
-  int M2__LPWM = 7;  // Digital/PWM pin 6 to the M4__LPWM on the BTS7960
-  int M2__L_EN = 26;  // connect Digital/PWM pin 7 to M4__L_EN on the BTS7960
-  int M2__R_EN = 27;  // connect Digital/PWM pin 8 to M4__R_EN on the BTS7960
+  int M2__RPWM = 4;  // Green
+  int M2__LPWM = 5;  // Grey
+  int M2__L_EN = 24;  // White
+  int M2__R_EN = 25;  // Blue
+ 
+//Motor 4
+  int M4__RPWM = 6;  // Digital/PWM pin 5 to the M4__RPWM on the BTS7960
+  int M4__LPWM = 7;  // Digital/PWM pin 6 to the M2__LPWM on the BTS7960
+  int M4__L_EN = 26;  // connect Digital/PWM pin 7 to M2__L_EN on the BTS7960
+  int M4__R_EN = 27;  // connect Digital/PWM pin 8 to M2__R_EN on the BTS7960
  
 //Motor 1
   int M1__RPWM = 8;  // Digital/PWM pin 5 to the M4__RPWM on the BTS7960
-  int M1__LPWM = 9;  // Digital/PWM pin 6 to the M4__LPWM on the BTS7960
-  int M1__L_EN = 28;  // connect Digital/PWM pin 7 to M4__L_EN on the BTS7960
-  int M1__R_EN = 29;  // connect Digital/PWM pin 8 to M4__R_EN on the BTS7960
+  int M1__LPWM = 9;  // Digital/PWM pin 6 to the M2__LPWM on the BTS7960
+  int M1__L_EN = 28;  // connect Digital/PWM pin 7 to M2__L_EN on the BTS7960
+  int M1__R_EN = 29;  // connect Digital/PWM pin 8 to M2__R_EN on the BTS7960
 
 
 
@@ -93,6 +83,10 @@ void setup() {
 
   //############  MOTOR DRIVER SETUP  #####################
 
+
+
+
+    
 //######  BEGIN Motor-4 pins initialization
     pinMode(M4__RPWM, OUTPUT);
     pinMode(M4__LPWM, OUTPUT);
@@ -107,23 +101,7 @@ void setup() {
     digitalWrite(M4__R_EN, LOW);
 //######  END Motor-4 pins initialization
 
-    
-//######  BEGIN Motor-3 pins initialization
-    pinMode(M3__RPWM, OUTPUT);
-    pinMode(M3__LPWM, OUTPUT);
-    pinMode(M3__L_EN, OUTPUT);
-    pinMode(M3__R_EN, OUTPUT);
-
-  // set all the pins to LOW
-
-    digitalWrite(M3__RPWM, LOW);
-    digitalWrite(M3__LPWM, LOW);
-    digitalWrite(M3__L_EN, LOW);
-    digitalWrite(M3__R_EN, LOW);
-//######  END Motor-3 pins initialization
-
-    
-//######  BEGIN Motor-2 pins initialization
+//######  BEGIN Motor-4 pins initialization
     pinMode(M2__RPWM, OUTPUT);
     pinMode(M2__LPWM, OUTPUT);
     pinMode(M2__L_EN, OUTPUT);
@@ -135,9 +113,8 @@ void setup() {
     digitalWrite(M2__LPWM, LOW);
     digitalWrite(M2__L_EN, LOW);
     digitalWrite(M2__R_EN, LOW);
-//######  END Motor-2 pins initialization
+//######  END Motor-4 pins initialization
 
-    
 //######  BEGIN Motor-1 pins initialization
     pinMode(M1__RPWM, OUTPUT);
     pinMode(M1__LPWM, OUTPUT);
@@ -152,9 +129,27 @@ void setup() {
     digitalWrite(M1__R_EN, LOW);
 //######  END Motor-1 pins initialization
 
+    
+
+
+
+  delay(1000);// wait a second
+  Serial.begin(9600);
   
- //FastLED.addLeds<LED_TYPE, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS);
- //FastLED.setBrightness(BRIGHTNESS);
+  //enable "Right" and "Left" movement on the HBridge
+  // Notice use of digitalWrite to simply turn it on and keep it on.
+
+
+  digitalWrite(M4__R_EN, HIGH);  
+  digitalWrite(M4__L_EN, HIGH); 
+  
+  digitalWrite(M2__R_EN, HIGH);  
+  digitalWrite(M2__L_EN, HIGH);
+  
+  digitalWrite(M1__R_EN, HIGH);  
+  digitalWrite(M1__L_EN, HIGH);
+
+
 
   
 }
@@ -163,36 +158,53 @@ void loop() {
 
 
 
-if (receiveFlag == true) {
-    Serial.println(temp);
-    String tempString(temp);
+
+  if (receiveFlag == true) {
+        //Serial.println(temp);
+        String tempString(temp);
 
 
+        String command = getValue(tempString,';',0);
+        String subCommand1 = getValue(tempString,';',1);
+        String subCommand2 = getValue(tempString,';',2);
+        String subCommand3 = getValue(tempString,';',3);
+        String subCommand4 = getValue(tempString,';',4);
+        String subCommand5 = getValue(tempString,';',5);
+        
+        Serial.println("\n\n\n\n**************************");
+        Serial.println("--Mega incoming commands--"); 
+        Serial.println("**************************\n");
+        Serial.println("command = " + command);
+        Serial.println("\n\nsubCommand1 = "+ subCommand1);
+        Serial.println("\nsubCommand2 = " + subCommand2);
+        Serial.println("\nsubCommand3 = "+ subCommand3);
+        Serial.println("\nsubCommand4 = "+ subCommand4);
+        Serial.println("\nsubCommand5 = "+ subCommand5 + "\n\n");
+     
 
 
-
-if (tempString == "lighton")                             // ############# Relay 7 Activated ##############
+if (command == "lighton")                             // ############# Relay 7 Activated ##############
        {
        Serial.println("Turning on the headlight");
        digitalWrite(RELAY_PIN7, LOW);
        }     
 
 
-if (tempString == "lightoff")                            // ############# Relay 7 Deactivataed ##############
+if (command == "lightoff")                            // ############# Relay 7 Deactivataed ##############
        {
        Serial.println("Turning off the headlight");
        digitalWrite(RELAY_PIN7, HIGH);
        }
 
        
-if (tempString == "relay6on")                            //  ############# Relay 6 Activated ##############
+if (command == "relay6on")                            //  ############# Relay 6 Activated ##############
        {
        Serial.println("Relay 6 on");
        digitalWrite(RELAY_PIN6, LOW);
        }
 
        
-if (tempString == "relay6off")                            //  ############# Relay 6 Deactivated ##############
+if (command == "relay6off")                            //  ############# Relay 6 Deactivated ##############
        {
        Serial.println("Relay 6 off");
        digitalWrite(RELAY_PIN6, HIGH);
@@ -205,98 +217,90 @@ if (tempString == "relay6off")                            //  ############# Rela
        }
 
        
-if (tempString == "relay5off")                            //  ############# Relay 5 Deactivated ##############
+if (command == "relay5off")                            //  ############# Relay 5 Deactivated ##############
        {
        Serial.println("Relay 5 off");
        digitalWrite(RELAY_PIN5, HIGH);
        }
 
 
-if (tempString == "relay4on")                            //  ############# Relay 4 Activated ##############
+if (command == "relay4on")                            //  ############# Relay 4 Activated ##############
        {
        Serial.println("Relay 4 on");
        digitalWrite(RELAY_PIN4, LOW);
        }
 
        
-if (tempString == "relay4off")                            //  ############# Relay 4 Deactivated ##############
+if (command == "relay4off")                            //  ############# Relay 4 Deactivated ##############
        {
        Serial.println("Relay 4 off");
        digitalWrite(RELAY_PIN4, HIGH);
        }
 
 
-if (tempString == "relay3on")                            //  ############# Relay 3 Activated ##############
+if (command == "relay3on")                            //  ############# Relay 3 Activated ##############
        {
        Serial.println("Relay 3 on");
        digitalWrite(RELAY_PIN3, LOW);
        }
 
        
-if (tempString == "relay3off")                            //  ############# Relay 3  Deactivated ##############
+if (command == "relay3off")                            //  ############# Relay 3  Deactivated ##############
        {
        Serial.println("Relay 3 off");
        digitalWrite(RELAY_PIN3, HIGH);
        }
 
 
-if (tempString == "screenon")                            //  ############# Relay 2 Activated ##############
+if (command == "screenon")                            //  ############# Relay 2 Activated ##############
        {
        Serial.println("Relay 2 on");
        digitalWrite(RELAY_PIN2, LOW);
        }
 
        
-if (tempString == "screenoff")                            //  ############# Relay 2 Deactivated ##############
+if (command == "screenoff")                            //  ############# Relay 2 Deactivated ##############
        {
        Serial.println("Relay 2 off");
        digitalWrite(RELAY_PIN2, HIGH);
        }
 
 
-if (tempString == "relay1on")                            //  ############# Relay 1 Activated ##############
+if (command == "relay1on")                            //  ############# Relay 1 Activated ##############
        {
        Serial.println("Relay 1 on");
        digitalWrite(RELAY_PIN1, LOW);
        }
 
        
-if (tempString == "relay1off")                            //  ############# Relay 1 Deactivated ##############
+if (command == "relay1off")                            //  ############# Relay 1 Deactivated ##############
        {
        Serial.println("Relay 1 off");
        digitalWrite(RELAY_PIN1, HIGH);
        }
 
 
-if (tempString == "relay0on")                            //  ############# Relay 0 Activated ##############
+if (command == "relay0on")                            //  ############# Relay 0 Activated ##############
        {
        Serial.println("Relay 0 on");
        digitalWrite(RELAY_PIN0, LOW);
        }
 
        
-if (tempString == "relay0off")                            //  ############# Relay 0 Deactivated ##############
+if (command == "relay0off")                            //  ############# Relay 0 Deactivated ##############
        {
        Serial.println("Relay 0 off");
        digitalWrite(RELAY_PIN0, HIGH);
        }
 
 
-
-if (tempString == "hello")
+if (command == "hello")
        {
        Serial.println("What do you want, human?");
        }
 
 
-
-if (tempString == "nigga")
-       {
-       
-       }
-
-
-if (tempString == "reset")
+if (command == "reset")
        {
        digitalWrite(RELAY_PIN0, HIGH);
        digitalWrite(RELAY_PIN1, HIGH);
@@ -309,18 +313,15 @@ if (tempString == "reset")
        }
 
        
-if (tempString == "motor2test")
+if (command == "motortest")
        {
-       motorctl();
-       
+       motortest();       
        }
 
        
-
-
-       
-if (tempString == "beep")
+if (command == "beep")
        {
+        Serial.println("beep");
        tone(buzzPin,587.33,400);
        delay(150);
        tone(buzzPin,554.37,300);
@@ -334,29 +335,24 @@ if (tempString == "beep")
 }
 
 
-/*oid moving_three_led() {
-  for (int i = 0; i < NUM_LEDS; i++) {
- int x = 71+i;
- int y = 70-i;
-//int  y = (x - i);   
-  //  leds[i]     = CRGB::White;
-    leds[i] = CRGB::Red;
-    leds[y] = CRGB::Red;
-  //  leds[i + 2] = CRGB::Red;
-   // leds[i + 3] = CRGB::Blue;
-     delay(5);
-     //leds[i] = CRGB::Black;
-   
-    FastLED.show();
-   // delay(50);
-  //  for (int i = 0; i < NUM_LEDS; i++) {
-    //  leds[i] = CRGB::Black;
-      //delay(5);
-   }
-   
+
+//################  Break incoming data String into multiple chunks ###################
+
+String getValue(String data, char separator, int index)
+{
+  int found = 0;
+  int strIndex[] = {0, -1};
+  int maxIndex = data.length()-1;
+
+  for(int i=0; i<=maxIndex && found<=index; i++){
+    if(data.charAt(i)==separator || i==maxIndex){
+        found++;
+        strIndex[0] = strIndex[1]+1;
+        strIndex[1] = (i == maxIndex) ? i+1 : i;
+    }
   }
+  return found>index ? data.substring(strIndex[0], strIndex[1]) : "";
 }
-*/
 
 
 void receiveEvent(int howMany) {
@@ -375,93 +371,72 @@ void receiveEvent(int howMany) {
 }
 
 
-void motorctl() {
+void motortest() {
 
-/*
- put your main code here, to run repeatedly:
+  // Motor 4
+  Serial.println("motor 4 start forward");
+  analogWrite(M4__RPWM, 64);     
+  delay(3000);                  
+  analogWrite(M4__RPWM, 128);    
+  delay(3000);                   
+  analogWrite(M4__RPWM, 0);      
+  Serial.println("motor 4 stop\n");
+  Serial.println("Wait for 2 seconds...\n");
+  delay(2000);
 
-  // Use an analogWrite(pin,  which tells it to send a modulated
-  // signal (PWM) to specific pin at a specific "duty cycle".
-  // Valid values are 0 to 255.  0 means always off(or no power) and 255 means always on(full power)
-  // https://www.arduino.cc/reference/en/language/functions/analog-io/analogwrite/
-  analogWrite(M4__RPWM, 64); // pulse a signal continually at the rate of 64 
-  // the analogWrite line above should start the motor turning in one direction at about 1/4 of power.
-  delay(1000); // wait 5 seconds, motor continues to move because the analogWrite is still pulsing
-  analogWrite(M4__RPWM, 128); // pulse signal now at 128 (about half power... half of max 255).
-  delay(1000);
-*/
-
-/*
-
-  // after 5 seconds at half power, stop the motor moving
-  analogWrite(M4__RPWM, 0);
-  delay(1000);
-  // now start moving in opposite direction.
+  // start moving in opposite direction.
+  Serial.println("motor 4 start reverse");
   analogWrite(M4__LPWM, 64);
-  delay(1000);
+  delay(3000);
   analogWrite(M4__LPWM, 128);
-  delay(1000);
-  analogWrite(M4__LPWM, 0); // Stop moving in this direction
-  // at this point should be no movement.
-
-
-
-
-
- analogWrite(M3__RPWM, 64); // pulse a signal continually at the rate of 64 
-  // the analogWrite line above should start the motor turning in one direction at about 1/4 of power.
-  delay(1000); // wait 5 seconds, motor continues to move because the analogWrite is still pulsing
-  analogWrite(M3__RPWM, 128); // pulse signal now at 128 (about half power... half of max 255).
-  delay(1000);
-
-  // after 5 seconds at half power, stop the motor moving
-  analogWrite(M3__RPWM, 0);
-  delay(1000);
-  // now start moving in opposite direction.
-  analogWrite(M3__LPWM, 64);
-  delay(1000);
-  analogWrite(M3__LPWM, 128);
-  delay(1000);
-  analogWrite(M3__LPWM, 0); // Stop moving in this direction
-  // at this point should be no movement.
+  delay(3000);
+  analogWrite(M4__LPWM, 0); 
+  Serial.println("motor 4 stop\n"); 
+  Serial.println("Wait for 2 seconds...\n");
+  delay(2000);  
   
+  // Motor 2
+  Serial.println("motor 2 start forward");
+  analogWrite(M2__RPWM, 64);     
+  delay(3000);                   
+  analogWrite(M2__RPWM, 128);    
+  delay(3000);                   
+  analogWrite(M2__RPWM, 0);      
+  Serial.println("motor 2 stop\n");
+  Serial.println("Wait for 2 seconds...\n");
+  delay(2000);
 
- analogWrite(M2__RPWM, 64); // pulse a signal continually at the rate of 64 
-  // the analogWrite line above should start the motor turning in one direction at about 1/4 of power.
-  delay(1000); // wait 5 seconds, motor continues to move because the analogWrite is still pulsing
-  analogWrite(M2__RPWM, 128); // pulse signal now at 128 (about half power... half of max 255).
-  delay(1000);
-
-  // after 5 seconds at half power, stop the motor moving
-  analogWrite(M2__RPWM, 0);
-  delay(1000);
-  // now start moving in opposite direction.
+  // start moving in opposite direction.
+  Serial.println("motor 2 start reverse\n");
   analogWrite(M2__LPWM, 64);
-  delay(1000);
+  delay(3000);
   analogWrite(M2__LPWM, 128);
-  delay(1000);
-  analogWrite(M2__LPWM, 0); // Stop moving in this direction
-  // at this point should be no movement
-
-*/
+  delay(3000);
+  analogWrite(M2__LPWM, 0); 
+  Serial.println("motor 2 stop\n"); 
+  Serial.println("Wait for 2 seconds...\n");
+  delay(2000); 
   
- analogWrite(M1__RPWM, 64); // pulse a signal continually at the rate of 64 
-  // the analogWrite line above should start the motor turning in one direction at about 1/4 of power.
-  delay(1000); // wait 5 seconds, motor continues to move because the analogWrite is still pulsing
-  analogWrite(M1__RPWM, 128); // pulse signal now at 128 (about half power... half of max 255).
-  delay(1000);
+  // Motor 1
+  Serial.println("motor 1 start forward");
+  analogWrite(M1__RPWM, 64);     
+  delay(3000);                   
+  analogWrite(M1__RPWM, 128);    
+  delay(3000);                   
+  analogWrite(M1__RPWM, 0);      
+  Serial.println("motor 1 stop\n");
+  Serial.println("Wait for 2 seconds...\n");
+  delay(2000);
 
-  // after 5 seconds at half power, stop the motor moving
-  analogWrite(M1__RPWM, 0);
-  delay(1000);
-  // now start moving in opposite direction.
+  // start moving in opposite direction.
+  Serial.println("motor 1 start reverse\n");
   analogWrite(M1__LPWM, 64);
-  delay(1000);
+  delay(3000);
   analogWrite(M1__LPWM, 128);
-  delay(1000);
-  analogWrite(M1__LPWM, 0); // Stop moving in this direction
-  // at this point should be no movement.
-  
-  delay(1000);
+  delay(3000);
+  analogWrite(M1__LPWM, 0); 
+  Serial.println("motor 1 stop\n"); 
+  Serial.println("Wait for 2 seconds...\n");
+  delay(2000);
 
 }
